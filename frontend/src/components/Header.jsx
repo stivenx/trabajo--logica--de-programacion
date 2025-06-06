@@ -41,9 +41,14 @@ const Header = () => {
               </button>
             </>
           ) : (
+            <div>
             <Link to="/login" className="hover:text-gray-300">
               Iniciar Sesión
             </Link>
+            <Link to="/categorias" className="hover:text-gray-300">
+              Categorias
+            </Link>
+            </div>
           )}
         </div>
       </nav>

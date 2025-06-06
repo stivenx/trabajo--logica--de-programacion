@@ -5,6 +5,10 @@ import Home from "./Home";
 import Login from "./Login";
 import Register from "./Register";
 import Productos from "./Productos";
+import CarritoPage from "./carrito"; 
+import  DetalleProducto from "./producto"; 
+import Categorias from "./categorias";
+import CatagoryProduct from "./productsCategori"
 
 const App = () => {
   return (
@@ -15,6 +19,11 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/productos" element={<Productos />} />
+        <Route path="/carrito" element={<CarritoPage />} />
+        <Route path="/productos/:id" element={<DetalleProducto />} />
+        <Route path="/categorias" element={<Categorias />} />
+        <Route path="/categorias/:id" element={<CatagoryProduct />} />
+       
       </Routes>
     </div>
   );

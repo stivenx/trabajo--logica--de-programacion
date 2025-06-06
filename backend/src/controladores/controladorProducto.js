@@ -51,3 +51,19 @@ exports.obtenerProductosPorCategoria = async (req, res) => {
       res.status(500).json({ mensaje: 'Error al obtener los productos', error: error.message });
     }
   };
+
+exports.obtenerProductoPorId = async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const producto = await Producto.findById(id).populate('categoria');
+  
+      if (!producto) {
+        return res.status(404).json({ mensaje: 'Producto no encontrado' });
+      }
+  
+      res.status(200).json(producto);
+    } catch (error) {
+      res.status(500).json({ mensaje: 'Error al obtener el producto', error: error.message });
+    }
+  };

@@ -4,7 +4,7 @@ const pool = require('../configuracion/baseDatosPostgres'); // Importa directame
 
 // Crear carrito
 exports.crearCarrito = async (req, res) => {
-    const { usuario_id, productos } = req.body;
+    const { usuario_id, productos,cantidad} = req.body;
 
     try {
         // Verificar si el usuario existe en PostgreSQL
@@ -20,6 +20,13 @@ exports.crearCarrito = async (req, res) => {
             return res.status(400).json({ mensaje: 'Uno o más productos no son válidos' });
         }
 
+        // Verificar que la cantidad sea válida
+        const cantidadInvalida = productos.some(p => p.cantidad <= 0 || p.cantidad > productosValidos.find(prod => prod._id.toString() === p.producto).stock);
+        if (cantidadInvalida) {
+        return res.status(400).json({ mensaje: 'La cantidad de uno o más productos es inválida' });
+        }
+
+
         // Verificar si ya existe un carrito para el usuario
         const carritoExistente = await Carrito.findOne({ usuario_id });
         if (carritoExistente) {
@@ -32,6 +39,14 @@ exports.crearCarrito = async (req, res) => {
             productos,
         });
         await nuevoCarrito.save();
+
+        // Restar la cantidad de productos del stock
+        await Promise.all(productos.map(async p => {
+            const producto = productosValidos.find(prod => prod._id.toString() === p.producto);
+            producto.stock -= p.cantidad;
+            await producto.save();
+        }));
+        
 
         res.status(201).json({ mensaje: 'Carrito creado', carrito: nuevoCarrito });
     } catch (error) {
