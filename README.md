@@ -9,5 +9,5 @@ npm init -y
 
 
 si se usa typescrip 
- npm install -D typescript ts-node @types/node @types/express @types/mongoose @types/cors nodemon eslint prettier eslint-config-prettier eslint-plugin-node eslint-plugin-import      
+ npm install -D typescript ts-node @types/node @types/express @types/mongoose @types/cors nodemon eslint prettier eslint-config-prettier eslint-plugin-node eslint-plugin-import  @types/mongoose @types/multer   
   npx tsc --init
