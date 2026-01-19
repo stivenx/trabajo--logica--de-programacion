@@ -4,18 +4,53 @@ const jwt = require('jsonwebtoken');
 
 // Registrar usuario
 exports.registrarUsuario = async (req, res) => {
-    const { nombre, correo, password, direccion, telefono, rol } = req.body;
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const resultado = await pool.query(
-            'INSERT INTO usuarios (nombre, correo, password, direccion, telefono, rol) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [nombre, correo, hashedPassword, direccion, telefono, rol || 'cliente']
-        );
-        return res.status(201).json({ mensaje: 'Usuario registrado', usuario: resultado.rows[0] });
-    } catch (error) {
-        return res.status(500).json({ mensaje: 'Error al crear el usuario', error: error.message });
+  const { nombre, correo, password, direccion, telefono, rol } = req.body;
+ 
+  console.log(nombre, correo, password, direccion, telefono, rol);
+  // 🔐 Validación básica
+  if (!nombre || !correo || !password) {
+    return res.status(400).json({ mensaje: "Faltan campos obligatorios" });
+  }
+
+  try {
+    // 🔎 Verificar si el correo ya existe
+    const existe = await pool.query(
+      "SELECT id FROM usuarios WHERE correo = $1",
+      [correo]
+    );
+
+    if (existe.rows.length > 0) {
+      return res.status(400).json({ mensaje: "El correo ya está registrado" });
     }
+
+    // 🔑 Encriptar contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 🧾 Insertar usuario
+    const resultado = await pool.query(
+      `INSERT INTO usuarios (nombre, correo, password, direccion, telefono, rol)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id`,
+      [nombre, correo, hashedPassword, direccion, telefono, rol || "cliente"]
+    );
+
+    // 🎫 Crear token
+    const token = jwt.sign(
+      { id: resultado.rows[0].id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.status(201).json({ mensaje: "Usuario registrado", token });
+  } catch (error) {
+    console.error("Error registro:", error);
+    res.status(500).json({
+      mensaje: "Error al crear el usuario",
+      error: error.message,
+    });
+  }
 };
+
 
 // Iniciar sesión
 exports.iniciarSesion = async (req, res) => {
@@ -74,3 +109,24 @@ exports.actualizarPerfilUsuario = async (req, res) => {
     }
 };
 
+
+exports.obtenerTodosLosUsuarios = async (req, res) => {
+    try {
+        const resultado = await pool.query('SELECT * FROM usuarios');
+        return res.status(200).json({ usuarios: resultado.rows });
+    } catch (error) {
+        return res.status(500).json({ error: 'Error al obtener los usuarios', error: error.message });
+    }
+};
+
+exports.obtenerUsuariosDeterminados = async (req, res) => {
+    const {users} = req.query;
+    try {
+        const GetUsers = users.split(',').map(user => (user));
+        const resultado = await pool.query(`SELECT * FROM usuarios WHERE id = ANY($1) order by id desc`, [GetUsers]);
+        return res.status(200).json(resultado.rows );
+    } catch (error) {
+        return res.status(500).json({ error: 'Error al obtener los usuarios', error: error.message });
+    }
+}
+ /*const placeholders = GetUsers.map((_, i) => `$${i + 1}`).join(',');*/

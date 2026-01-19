@@ -4,6 +4,7 @@ const cors = require('cors');
 const conectarBDMongo = require('./src/configuracion/baseDatos'); // MongoDB
 const pool = require('./src/configuracion/baseDatosPostgres'); // Importamos el pool directamente
 const middlewareAutenticacion = require('./src/middleware/middlewareAutenticacion');
+const path = require('path');
 
 // Configuración del entorno
 dotenv.config();
@@ -22,12 +23,15 @@ pool.connect()
     
     .catch(err => console.error('Error al conectar a PostgreSQL:', err.message));
 
+
+app.use("/productos",express.static(path.join(__dirname, "./productos")));
 // Rutas
 app.use('/api/productos', require('./src/rutas/rutasProducto'));
 app.use('/api/usuarios', require('./src/rutas/rutasUsuario'));
 app.use('/api/ordenes', require('./src/rutas/rutasOrden'));
 app.use('/api/carrito', require('./src/rutas/rutasCarrito'));
 app.use('/api/categorias', require('./src/rutas/rutasCategoria'));
+app.use('/api/products', require('./src/rutas/routesProducts'));
 
 // Ruta protegida (perfil del usuario)
 app.get('/api/usuarios/perfil', middlewareAutenticacion, (req, res) => {

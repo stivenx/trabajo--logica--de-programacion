@@ -36,3 +36,17 @@ exports.eliminarCategoria = async (req, res) => {
         res.status(500).json({ mensaje: 'Error al eliminar la categoría', error: error.message });
     }
 };
+
+
+exports.obtenerCategoriaPorId = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const categoria = await Categoria.findById(id);
+        if (!categoria) {
+            return res.status(404).json({ mensaje: 'Categoría no encontrada' });
+        }
+        res.status(200).json(categoria);
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al obtener la categoría', error: error.message });
+    }
+};

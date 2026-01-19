@@ -18,11 +18,9 @@ const Login = () => {
         password, 
       });
       localStorage.setItem("token", response.data.token); 
-      localStorage.setItem(
-        "usuario",
-        JSON.stringify({ nombre: response.data.nombre }) 
-      );
-      navigate("/productos"); 
+      window.dispatchEvent(new Event("authChange")); 
+     
+      navigate("/products"); 
     } catch (err) {
       if (err.response) {
         setError(err.response.data.mensaje || "Error al iniciar sesión");
