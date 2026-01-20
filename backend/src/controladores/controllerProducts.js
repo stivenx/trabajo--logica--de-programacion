@@ -501,4 +501,22 @@ ORDER BY p.id;
   
   
   
-  */ 
+  */ /*
+ Siempre que veas:
+
+rejected (non-fast-forward)
+
+
+👉 git pull --rebase primero
+👉 luego git push*/
+
+
+/*SOLUCIÓN CORRECTA (segura y definitiva)
+1️⃣ Quita la imagen del tracking (NO la borra de tu PC)
+git rm --cached backend/productos/sonic.jpeg
+
+2️⃣ Confirma el cambio
+git commit -m "remove tracked image from repo"
+
+3️⃣ Sube los cambios
+git push origin main*/
