@@ -33,7 +33,7 @@ const ProductsSelectCategori = () => {
   useEffect(() => {
     
 
-    fetchProductos();
+   
      fetchCategorias();
   }, []);
 

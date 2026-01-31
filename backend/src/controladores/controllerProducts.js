@@ -70,6 +70,14 @@ exports.crearProduct = async(req,res) =>{
     res.status(201).json({ mensaje: 'Producto creado correctamente', id: productId });
  } catch (error) {
     console.log(error);
+     if(req.files&&req.files.length>0){
+        for(const image of req.files){
+            const ruta = path.join(__dirname,`../../productos/${image.filename}`);
+            if(fs.existsSync(ruta)){
+                await fs.promises.unlink(ruta);
+            }
+        }
+     }
     res.status(500).json({ error: 'Error al crear el producto', error: error.message });
     
  }
@@ -492,6 +500,30 @@ LEFT JOIN (
 ) vid ON vid.producto_id = p.id
 
 ORDER BY p.id;
+ 
+
+ SELECT
+  p.id,
+  p.nombre,
+  p.precio,
+  p.stock,
+  p.categoria,
+  COALESCE(img.imagenes, '[]'::json) AS imagenes
+from productos p
+
+left join(
+
+  select producto_id,json_agg(nombre_archivo) as imagenes
+  from(
+  select distinct on (nombre_archivo,producto_id)
+   id,nombre_archivo,producto_id
+  from productos_imagenes
+  order by nombre_archivo,producto_id, id  asc
+)x
+group by producto_id
+  ) img on img.producto_id = p.id
+
+order by p.id
 
 
   

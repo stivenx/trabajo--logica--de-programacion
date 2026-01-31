@@ -9,8 +9,17 @@ const pool = new Pool({
 });
 
 // Este bloque es opcional para verificar la conexión al iniciar
-pool.connect()
-    .then(() => console.log('Conexión exitosa a PostgreSQL'))
-    .catch(err => console.error('Error al conectar a PostgreSQL:', err.message));
+const testConnection = async () => {
+  try {
+    await pool.query("SELECT 1");
+    console.log("Conexión a PostgreSQL OK");
+  } catch (error) {
+    console.error("Error PostgreSQL:", error.message);
+  }
+};
+
+(async () => {
+  await testConnection();
+})();
 
 module.exports = pool;
